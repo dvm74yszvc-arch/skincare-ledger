@@ -17,7 +17,7 @@ h1 { font-family: 'Newsreader', serif; font-size: 32px; font-weight: 400; font-s
 .meta-info { font-size: 13px; color: var(--grey); }
 .meta-info a { color: var(--wine); text-decoration: underline; cursor: pointer; }
 /* Navigation Tabs */
-.tabs { display: flex; gap: 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+.tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px; flex-wrap: wrap; }
 .tab { padding: 10px 0; font-size: 14px; color: var(--grey); background: none; border: none; cursor: pointer; position: relative; font-family: 'Inter', sans-serif; }
 .tab.active { color: var(--ink); font-weight: 500; }
 .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background-color: var(--wine); }
@@ -38,18 +38,23 @@ input[type="text"], textarea, select { width: 100%; background: rgba(255, 255, 2
 input:focus, textarea:focus, select:focus { outline: none; border-color: var(--wine); }
 .btn-primary { width: 100%; background-color: var(--wine); color: white; border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
 .btn-primary:hover { background-color: var(--wine-deep); }
-/* Note to partner section */
+/* Note & Reactions */
 .section-heading { font-family: 'Newsreader', serif; font-style: italic; font-size: 20px; margin-bottom: 12px; color: var(--ink); }
 .chat-input-row { display: flex; gap: 10px; }
 .chat-input-row input { margin-bottom: 0; }
 .btn-send { background-color: var(--wine); color: white; border: none; border-radius: 8px; padding: 0 20px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
 .message-box { font-size: 14px; color: var(--grey); text-align: center; padding: 20px; margin-bottom: 15px; font-style: italic; }
-/* Shelf Table */
+.reactions-row { display: flex; gap: 10px; margin-top: 12px; justify-content: center; }
+.reaction-btn { background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+.reaction-btn:hover { background: #EDE6D8; border-color: var(--wine); }
+/* Tables & Badges */
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
 th { text-align: left; padding: 10px; border-bottom: 2px solid var(--border); color: var(--grey); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-td { padding: 12px 10px; border-bottom: 1px solid var(--border); }
-.badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; margin-right: 4px; margin-bottom: 3px; }
 .badge-active { background-color: #DFD5C3; color: var(--wine-deep); }
+.badge-zone { background-color: #EDE6D8; color: var(--ink); border: 1px solid var(--border); }
+.badge-shelf { background-color: #E2D9C8; color: var(--wine-deep); font-style: italic; }
 </style>
 </head>
 <body>
@@ -61,9 +66,11 @@ td { padding: 12px 10px; border-bottom: 1px solid var(--border); }
 <div class="tabs">
 <button class="tab active" onclick="switchTab('today')">Today</button>
 <button class="tab" onclick="switchTab('shelf')">My Shelf</button>
-<button class="tab" onclick="switchTab('lanes')">Both Lanes</button>
-<button class="tab" onclick="switchTab('recap')">Recap</button>
+<button class="tab" onclick="switchTab('routine')">Routine</button>
+<button class="tab" onclick="switchTab('wishlist')">Wishlist & Recs</button>
+<button class="tab" onclick="switchTab('recap')">Recap & History</button>
 </div>
+
 <!-- TODAY VIEW -->
 <div id="view-today" class="view active">
 <div class="card">
@@ -80,17 +87,23 @@ td { padding: 12px 10px; border-bottom: 1px solid var(--border); }
 <div class="mood-btn" onclick="setMood('🌟')">🌟</div>
 </div>
 <input type="text" id="daily-note" placeholder="Quick note (optional) — e.g. tiny purging on chin">
-<button class="btn-primary" onclick="saveToday()">Save Today</button>
+<button class="btn-primary" onclick="saveToday()">Save Today's Log</button>
 </div>
 <div class="section-heading" id="note-to-partner-title">Note to Sukriti</div>
 <div class="card">
-<div class="message-box" id="partner-message-display">No notes yet — leave one below.</div>
+<div class="message-box" id="partner-message-display">No notes yet — leave one below or send a reaction!</div>
 <div class="chat-input-row">
 <input type="text" id="partner-msg-input" placeholder="Say something to your lane partner...">
 <button class="btn-send" onclick="sendPartnerMsg()">Send</button>
 </div>
+<div class="reactions-row">
+<button class="reaction-btn" onclick="sendReaction('❤️')">❤️ Send Heart</button>
+<button class="reaction-btn" onclick="sendReaction('✨')">✨ Send Sparkle</button>
+<button class="reaction-btn" onclick="sendReaction('👍')">👍 Send Cheers</button>
 </div>
 </div>
+</div>
+
 <!-- MY SHELF VIEW -->
 <div id="view-shelf" class="view">
 <div class="card">
@@ -104,6 +117,8 @@ td { padding: 12px 10px; border-bottom: 1px solid var(--border); }
 <option value="Sunscreen">Sunscreen</option>
 <option value="Serum">Serum</option>
 <option value="Exfoliant">Exfoliant</option>
+<option value="Body Care">Body Care</option>
+<option value="Lip Care">Lip Care</option>
 </select>
 </div>
 <button class="btn-primary" onclick="addProduct()">Add to Shelf</button>
@@ -112,40 +127,99 @@ td { padding: 12px 10px; border-bottom: 1px solid var(--border); }
 <div class="card-title">Current Shelf</div>
 <table>
 <thead>
-<tr><th>Product</th> <th>Category</th> <th>Started</th> <th>Status</th> </tr>
+<tr><th>Product</th> <th>Category</th> <th>Started</th> <th>Status</th> <th>Action</th></tr>
 </thead>
 <tbody id="shelf-table-body"></tbody>
 </table>
 </div>
 </div>
-<!-- BOTH LANES VIEW -->
-<div id="view-lanes" class="view">
+
+<!-- ROUTINE VIEW -->
+<div id="view-routine" class="view">
 <div class="card">
-<div class="card-title">Shared Activity Log</div>
-<table id="timeline-table">
+<div class="card-title" id="routine-form-title">Add Routine Step</div>
+<input type="hidden" id="edit-routine-index" value="-1">
+<div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px;">
+<select id="routine-time">
+<option value="AM">☀️ Morning (AM)</option>
+<option value="PM">🌙 Night (PM)</option>
+</select>
+<select id="routine-shelf-link">
+<option value="">🔗 Link product from shelf (Optional)</option>
+</select>
+</div>
+<input type="text" id="routine-step" placeholder="Step name / Action (e.g. Cleanser or Iceicle under eyes)">
+<input type="text" id="routine-zones" placeholder="Target areas comma separated (e.g. Face + neck, Around mouth, Knees + elbows)">
+<input type="text" id="routine-notes" placeholder="Notes / Specific instructions (optional)">
+<button class="btn-primary" id="routine-submit-btn" onclick="saveRoutineStep()">Add Step to Routine</button>
+</div>
+
+<!-- AM ROUTINE CARD -->
+<div class="card">
+<div class="card-title">☀️ AM Routine &mdash; <span id="am-owner-title">Anurag</span></div>
+<table>
 <thead>
-<tr> <th>Who</th> <th>Activity / Status</th> </tr>
+<tr><th>Step / Product</th> <th>Target Areas</th> <th>Notes & Instructions</th> <th>Action</th></tr>
 </thead>
-<tbody id="timeline-body"></tbody>
+<tbody id="am-routine-table-body"></tbody>
+</table>
+</div>
+
+<!-- PM ROUTINE CARD -->
+<div class="card">
+<div class="card-title">🌙 PM Routine &mdash; <span id="pm-owner-title">Anurag</span></div>
+<table>
+<thead>
+<tr><th>Step / Product</th> <th>Target Areas</th> <th>Notes & Instructions</th> <th>Action</th></tr>
+</thead>
+<tbody id="pm-routine-table-body"></tbody>
 </table>
 </div>
 </div>
-<!-- RECAP VIEW -->
+
+<!-- WISHLIST & RECS VIEW -->
+<div id="view-wishlist" class="view">
+<div class="card">
+<div class="card-title">Add to Shared Wishlist / Recommendation</div>
+<input type="text" id="wish-name" placeholder="Product or recommendation name">
+<input type="text" id="wish-note" placeholder="Why try it? / Notes (optional)">
+<button class="btn-primary" onclick="addWishlist()">Add to Wishlist</button>
+</div>
+<div class="card">
+<div class="card-title">Shared Wishlist & Recommendations</div>
+<table>
+<thead>
+<tr><th>Item</th> <th>Added By</th> <th>Note</th> <th>Action</th></tr>
+</thead>
+<tbody id="wishlist-table-body"></tbody>
+</table>
+</div>
+</div>
+
+<!-- RECAP & HISTORY VIEW -->
 <div id="view-recap" class="view">
-<div class="card-title">August 2026 Summary</div>
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-<div class="card" style="text-align:center;">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+<div class="card" style="text-align:center; margin-bottom:0;">
 <div style="font-family:'Newsreader',serif; font-size:36px; color:var(--wine-deep);" id="stat-days">0</div>
 <div class="card-label" style="font-size:12px; color:var(--grey);">Total Logs Saved</div>
 </div>
-<div class="card" style="text-align:center;">
+<div class="card" style="text-align:center; margin-bottom:0;">
 <div style="font-family:'Newsreader',serif; font-size:36px; color:var(--wine-deep);" id="stat-products">0</div>
-<div class="card-label" style="font-size:12px; color:var(--grey);">Total Products on Shelf</div>
+<div class="card-label" style="font-size:12px; color:var(--grey);">Total Products on Shelves</div>
 </div>
 </div>
+<div class="card">
+<div class="card-title">Past Logs & History</div>
+<table>
+<thead>
+<tr><th>Who</th> <th>Log Details</th> <th>Date</th></tr>
+</thead>
+<tbody id="history-table-body"></tbody>
+</table>
 </div>
+</div>
+
 <script>
-// Supabase configuration pre-filled
 const SUPABASE_URL = "https://hunhqkadqhgqzcoeadpx.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_WtJxph_u8c31PGsF4j-HXg_rAlrIRAf";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -156,9 +230,13 @@ let pmDone = false;
 let selectedMood = '';
 let appData = { 
   shelves: { 'Anurag': [], 'Sukriti': [] }, 
-  messages: { 'Anurag': '', 'Sukriti': '' }, 
-  logs: [] 
+  messages: { 'Anurag': '', 'Sukriti': [] }, 
+  logs: [],
+  wishlist: [],
+  routines: { 'Anurag': [], 'Sukriti': [] }
 };
+
+document.getElementById('current-date-header').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
 async function loadData() {
   const { data, error } = await supabaseClient
@@ -168,17 +246,8 @@ async function loadData() {
     .single();
   if (data && data.state_json) { 
     appData = JSON.parse(data.state_json); 
-    // Migrate keys if loaded from old X/Y state
-    if (appData.shelves['X'] && !appData.shelves['Anurag']) {
-      appData.shelves['Anurag'] = appData.shelves['X'] || [];
-      appData.shelves['Sukriti'] = appData.shelves['Y'] || [];
-      appData.messages['Anurag'] = appData.messages['X'] || '';
-      appData.messages['Sukriti'] = appData.messages['Y'] || '';
-      appData.logs.forEach(l => {
-        if (l.who === 'X') l.who = 'Anurag';
-        if (l.who === 'Y') l.who = 'Sukriti';
-      });
-    }
+    if (!appData.wishlist) appData.wishlist = [];
+    if (!appData.routines) appData.routines = { 'Anurag': [], 'Sukriti': [] };
   }
   renderAll();
 }
@@ -196,6 +265,9 @@ function switchUser() {
   document.getElementById('partner-name').innerText = partnerName;
   document.getElementById('note-to-partner-title').innerText = `Note to ${partnerName}`;
   document.getElementById('partner-msg-input').placeholder = `Say something to ${partnerName}...`;
+  document.getElementById('am-owner-title').innerText = currentUser;
+  document.getElementById('pm-owner-title').innerText = currentUser;
+  resetRoutineForm();
   renderAll();
 }
 
@@ -226,11 +298,11 @@ async function saveToday() {
   const note = document.getElementById('daily-note').value;
   appData.logs.push({
     who: currentUser,
-    text: `AM: ${amDone ? '✔️' : '❌'} | PM: ${pmDone ? '✔️' : '❌'} | Mood: ${selectedMood || 'None'} ${note ? '— ' + note : ''}`,
+    text: `☀️ AM: ${amDone ? '✔️' : '❌'} | 🌙 PM: ${pmDone ? '✔️' : '❌'} | Mood: ${selectedMood || 'None'} ${note ? '— ' + note : ''}`,
     date: new Date().toLocaleDateString()
   });
   await saveData();
-  alert('Saved successfully to the cloud!');
+  alert('Saved today’s log successfully to the cloud!');
   renderAll();
 }
 
@@ -243,6 +315,13 @@ async function sendPartnerMsg() {
     renderAll();
     alert(`Note sent to ${partnerName}!`);
   }
+}
+
+async function sendReaction(emoji) {
+  appData.messages[currentUser] = `${emoji} Sent a quick reaction!`;
+  await saveData();
+  renderAll();
+  alert(`Reaction ${emoji} sent to ${partnerName}!`);
 }
 
 async function addProduct() {
@@ -261,30 +340,174 @@ async function addProduct() {
   renderAll();
 }
 
+async function removeProduct(index) {
+  if (confirm('Are you sure you want to remove this product from your shelf?')) {
+    appData.shelves[currentUser].splice(index, 1);
+    await saveData();
+    renderAll();
+  }
+}
+
+async function saveRoutineStep() {
+  const time = document.getElementById('routine-time').value;
+  const step = document.getElementById('routine-step').value;
+  const zones = document.getElementById('routine-zones').value;
+  const notes = document.getElementById('routine-notes').value;
+  const linkedShelf = document.getElementById('routine-shelf-link').value;
+  const editIndex = parseInt(document.getElementById('edit-routine-index').value);
+
+  if(!step) return alert('Please enter a step or product name.');
+  if(!appData.routines[currentUser]) appData.routines[currentUser] = [];
+
+  const entry = { time, step, zones: zones || 'Face + neck', notes: notes || '—', linkedShelf: linkedShelf || '' };
+
+  if (editIndex === -1) {
+    appData.routines[currentUser].push(entry);
+  } else {
+    appData.routines[currentUser][editIndex] = entry;
+  }
+
+  resetRoutineForm();
+  await saveData();
+  renderAll();
+}
+
+function editRoutineStep(index) {
+  const r = appData.routines[currentUser][index];
+  document.getElementById('routine-time').value = r.time;
+  document.getElementById('routine-step').value = r.step;
+  document.getElementById('routine-zones').value = r.zones === 'Face + neck' ? '' : r.zones;
+  document.getElementById('routine-notes').value = r.notes === '—' ? '' : r.notes;
+  document.getElementById('routine-shelf-link').value = r.linkedShelf || '';
+  document.getElementById('edit-routine-index').value = index;
+  document.getElementById('routine-form-title').innerText = 'Edit Routine Step';
+  document.getElementById('routine-submit-btn').innerText = 'Update Routine Step';
+}
+
+function resetRoutineForm() {
+  document.getElementById('routine-step').value = '';
+  document.getElementById('routine-zones').value = '';
+  document.getElementById('routine-notes').value = '';
+  document.getElementById('routine-shelf-link').value = '';
+  document.getElementById('edit-routine-index').value = -1;
+  document.getElementById('routine-form-title').innerText = 'Add Routine Step';
+  document.getElementById('routine-submit-btn').innerText = 'Add Step to Routine';
+}
+
+async function removeRoutineStep(index) {
+  if (confirm('Are you sure you want to delete this routine step?')) {
+    appData.routines[currentUser].splice(index, 1);
+    await saveData();
+    renderAll();
+  }
+}
+
+async function addWishlist() {
+  const name = document.getElementById('wish-name').value;
+  const note = document.getElementById('wish-note').value;
+  if(!name) return alert('Please enter an item name.');
+  if(!appData.wishlist) appData.wishlist = [];
+  appData.wishlist.push({
+    name: name,
+    addedBy: currentUser,
+    note: note || '—'
+  });
+  document.getElementById('wish-name').value = '';
+  document.getElementById('wish-note').value = '';
+  await saveData();
+  renderAll();
+}
+
+async function removeWishlist(index) {
+  if (confirm('Are you sure you want to remove this wishlist item?')) {
+    appData.wishlist.splice(index, 1);
+    await saveData();
+    renderAll();
+  }
+}
+
 function renderAll() {
-  document.getElementById('partner-message-display').innerText = appData.messages[partnerName] || "No notes yet — leave one below.";
+  // Partner message
+  document.getElementById('partner-message-display').innerText = appData.messages[partnerName] || "No notes yet — leave one below or send a reaction!";
+  
+  // Render Shelf Table
   const tbody = document.getElementById('shelf-table-body');
   tbody.innerHTML = '';
-  (appData.shelves[currentUser] || []).forEach(p => {
+  const shelfLinkSelect = document.getElementById('routine-shelf-link');
+  shelfLinkSelect.innerHTML = '<option value="">🔗 Link product from shelf (Optional)</option>';
+
+  (appData.shelves[currentUser] || []).forEach((p, index) => {
     tbody.innerHTML += `
       <tr>
         <td><strong>${p.name}</strong></td>
         <td>${p.cat}</td>
         <td>${p.started}</td>
         <td><span class="badge badge-active">${p.status}</span></td>
+        <td><button onclick="removeProduct(${index})" style="background:none; border:none; color:var(--wine); cursor:pointer; font-size:12px; text-decoration:underline;">Delete</button></td>
+      </tr>
+    `;
+    shelfLinkSelect.innerHTML += `<option value="${p.name}">${p.name} (${p.cat})</option>`;
+  });
+
+  // Render AM and PM Routines separately
+  const amBody = document.getElementById('am-routine-table-body');
+  const pmBody = document.getElementById('pm-routine-table-body');
+  amBody.innerHTML = '';
+  pmBody.innerHTML = '';
+
+  (appData.routines[currentUser] || []).forEach((r, index) => {
+    const zonesHtml = r.zones.split(',').map(z => `<span class="badge badge-zone">${z.trim()}</span>`).join(' ');
+    const shelfBadge = r.linkedShelf ? `<br><span class="badge badge-shelf">shelf: ${r.linkedShelf}</span>` : '';
+    
+    const rowHtml = `
+      <tr>
+        <td><strong>${r.step}</strong>${shelfBadge}</td>
+        <td>${zonesHtml}</td>
+        <td>${r.notes}</td>
+        <td>
+          <button onclick="editRoutineStep(${index})" style="background:none; border:none; color:var(--wine); cursor:pointer; font-size:12px; text-decoration:underline; margin-right: 10px;">Edit</button>
+          <button onclick="removeRoutineStep(${index})" style="background:none; border:none; color:var(--grey); cursor:pointer; font-size:12px; text-decoration:underline;">Delete</button>
+        </td>
+      </tr>
+    `;
+
+    if (r.time === 'AM') {
+      amBody.innerHTML += rowHtml;
+    } else {
+      pmBody.innerHTML += rowHtml;
+    }
+  });
+
+  if(amBody.innerHTML === '') amBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--grey); font-style:italic; padding:15px;">No AM routine steps added yet.</td></tr>`;
+  if(pmBody.innerHTML === '') pmBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--grey); font-style:italic; padding:15px;">No PM routine steps added yet.</td></tr>`;
+
+  // Render Wishlist
+  const wishBody = document.getElementById('wishlist-table-body');
+  wishBody.innerHTML = '';
+  (appData.wishlist || []).forEach((w, index) => {
+    wishBody.innerHTML += `
+      <tr>
+        <td><strong>${w.name}</strong></td>
+        <td>${w.addedBy}</td>
+        <td>${w.note}</td>
+        <td><button onclick="removeWishlist(${index})" style="background:none; border:none; color:var(--wine); cursor:pointer; font-size:12px; text-decoration:underline;">Delete</button></td>
       </tr>
     `;
   });
-  const tBody = document.getElementById('timeline-body');
-  tBody.innerHTML = '';
+
+  // Render History / Logs
+  const historyBody = document.getElementById('history-table-body');
+  historyBody.innerHTML = '';
   (appData.logs || []).slice().reverse().forEach(l => {
-    tBody.innerHTML += `
+    historyBody.innerHTML += `
       <tr>
         <td><strong>${l.who}</strong></td>
-        <td>${l.text} <br><small style="color:var(--grey);">${l.date}</small></td>
+        <td>${l.text}</td>
+        <td><small style="color:var(--grey);">${l.date}</small></td>
       </tr>
     `;
   });
+
   document.getElementById('stat-days').innerText = appData.logs.length;
   document.getElementById('stat-products').innerText = (appData.shelves['Anurag'] || []).length + (appData.shelves['Sukriti'] || []).length;
 }
