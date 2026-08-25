@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skincare Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;">
+<style>
+  :root{
+    --paper:#EAE3D6;
+    --paper-raised:#F5F0E6;
+    --ink:#332B2C;
+    --ink-soft:#867F78;
+    --moss:#722F3B;
+    --moss-deep:#4E1F27;
+    --clay:#8C8378;
+    --amber:#A15263;
+    --line:#D6CDBC;
+    --lane-a:#722F3B;
+    --lane-b:#7C766D;
+    --radius:14px;
+    font-family:'Newsreader', Georgia, serif;
+  }
+  * { box-sizing:border-box; }
+  #skincare-app{
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100%;
+    padding:0;
+    font-family:'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .display{
+    font-family:'Newsreader', Georgia, serif;
+    font-optical-sizing:auto;
+  }
+  .sc-header{
+    padding:28px 20px 18px;
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:5;
+    background:var(--paper);
+  }
+  .sc-header h1{
+    font-size:26px;
+    font-weight:600;
+    font-style:italic;
+    margin:4px 0 2px;
+    letter-spacing:-0.01em;
+  }
+  .sc-sub{ color:var(--ink-soft); font-size:13px; }
+  .sc-tabs{
+    display:flex; gap:6px; padding:14px 20px 0;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    position:sticky; top:78px; z-index:4;
+  }
+  .sc-tab{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:0.04em;
+    padding:9px 14px;
+    background:none; border:none; cursor:pointer;
+    color:var(--ink-soft);
+    border-bottom:2px solid transparent;
+    transform:translateY(1px);
+  }
+  .sc-tab.active{ color:var(--ink); border-bottom-color:var(--moss); font-weight:600; }
+  .sc-body{ padding:18px 16px 90px; max-width:720px; margin:0 auto; }
+
+  .setup-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; text-align:center; margin-top:40px;
+  }
+  .setup-card h2{ font-size:20px; font-style:italic; margin-bottom:6px; }
+  .setup-card p{ color:var(--ink-soft); font-size:13px; margin-bottom:16px; }
+  .name-inputs{ display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+  input, select, textarea{
+    font-family:'Inter', sans-serif; font-size:14px;
+    border:1px solid var(--line); border-radius:9px;
+    padding:10px 12px; background:var(--paper); color:var(--ink);
+    width:100%;
+  }
+  input:focus, select:focus, textarea:focus{ outline:2px solid var(--moss); outline-offset:1px; }
+  .btn{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.04em;
+    background:var(--moss); color:#fff; border:none; border-radius:9px;
+    padding:11px 16px; cursor:pointer; text-transform:uppercase;
+  }
+  .btn:active{ background:var(--moss-deep); }
+  .btn.ghost{
+    background:none; color:var(--moss-deep); border:1px solid var(--moss);
+  }
+  .btn.small{ padding:7px 10px; font-size:11px; }
+  .btn.clay{ background:var(--clay); }
+  .btn:disabled{ opacity:0.5; }
+
+  .who-picker{ display:flex; gap:8px; margin:14px 0 18px; }
+  .who-pill{
+    flex:1; padding:12px; border-radius:11px; border:1px solid var(--line);
+    background:var(--paper-raised); cursor:pointer; text-align:center;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.03em;
+  }
+  .who-pill.active-a{ border-color:var(--lane-a); background:#EFE6E4; color:var(--moss-deep); font-weight:600; }
+  .who-pill.active-b{ border-color:var(--lane-b); background:#EFEBE3; color:#5C4A44; font-weight:600; }
+
+  .checkin-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; margin-bottom:16px;
+  }
+  .checkin-card .date-lbl{ font-size:12px; }
+  .checkin-row{ display:flex; gap:10px; margin:12px 0; }
+  .toggle{
+    flex:1; padding:12px; text-align:center; border-radius:10px;
+    border:1px solid var(--line); cursor:pointer; font-size:13px;
+  }
+  .toggle.on{ background:var(--moss); color:#fff; border-color:var(--moss); }
+  .mood-row{ display:flex; gap:8px; margin:10px 0; }
+  .mood-btn{
+    flex:1; font-size:20px; padding:8px 0; border-radius:9px; border:1px solid var(--line);
+    background:var(--paper); cursor:pointer;
+  }
+  .mood-btn.on{ background:var(--amber); border-color:var(--amber); }
+  .streak-badge{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--moss-deep);
+    background:#EFE6E4; border-radius:99px; padding:4px 10px; display:inline-block; margin-top:8px;
+  }
+
+  .section-title{
+    font-family:'Newsreader', serif; font-style:italic; font-size:17px; margin:22px 0 10px;
+  }
+  .product-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px; margin-bottom:10px; position:relative;
+  }
+  .product-card .name{ font-weight:600; font-size:15px; }
+  .product-card .meta{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); margin-top:3px; }
+  .status-tag{
+    position:absolute; top:14px; right:14px;
+    font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.03em;
+    padding:3px 8px; border-radius:99px; text-transform:uppercase;
+  }
+  .status-active{ background:#EFE6E4; color:var(--moss-deep); }
+  .status-finished{ background:#E8E2D8; color:#5C4A44; }
+  .verdict-row{ display:flex; gap:6px; margin-top:10px; }
+  .verdict-chip{
+    font-size:11px; padding:5px 9px; border-radius:99px; border:1px solid var(--line);
+    background:var(--paper); cursor:pointer;
+  }
+  .verdict-chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+  .add-form{ display:flex; flex-direction:column; gap:8px; }
+  .form-row{ display:flex; gap:8px; }
+  .form-row > *{ flex:1; }
+
+  .lane-track{ position:relative; padding-left:14px; }
+  .lane-track::before{
+    content:''; position:absolute; left:4px; top:4px; bottom:4px; width:1px; background:var(--line);
+  }
+  .lane-entry{
+    position:relative; margin-bottom:12px; background:var(--paper-raised);
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+  }
+  .lane-entry::before{
+    content:''; position:absolute; left:-14px; top:16px; width:7px; height:7px; border-radius:50%;
+  }
+  .lane-entry.a::before{ background:var(--lane-a); }
+  .lane-entry.b::before{ background:var(--lane-b); }
+  .lane-entry .who{ font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--ink-soft); }
+  .lane-entry .txt{ font-size:13px; margin-top:2px; }
+
+  .recap-card{
+    background:var(--ink); color:var(--paper); border-radius:var(--radius); padding:18px; margin-bottom:16px;
+  }
+  .recap-card .eyebrow{ color:#B9B6A8; }
+  .recap-card h3{ font-style:italic; font-size:18px; margin:4px 0 10px; }
+  .recap-stat{ display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:1px solid #5A5450; }
+  .recap-stat:last-child{ border-bottom:none; }
+
+  .empty{ text-align:center; padding:30px 10px; color:var(--ink-soft); font-size:13px; }
+  .compose{ display:flex; gap:8px; margin-top:10px; }
+  .compose input{ flex:1; }
+  .note-thread{ max-height:180px; overflow-y:auto; margin-bottom:8px; }
+  .note-item{ font-size:12.5px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .note-item .who{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ink-soft); text-transform:uppercase; margin-right:6px; }
+</style>
+
+<div id="skincare-app"><div id="sc-root">Loading…</div></div>
+
+<script>
+(function(){
+  const root = document.getElementById('sc-root');
+  const CATS = ['Cleanser','Moisturizer','Retinol','Sunscreen','Serum','Exfoliant','Other'];
+  const MOODS = ['😊','😐','😣','🌟'];
+  const MOOD_LABELS = {'😊':'Calm','😐':'Neutral','😣':'Irritated','🌟':'Glowing'};
+  const VERDICTS = ['Glow','Meh','Breakout','Still deciding'];
+  let state = { meta:null, dataA:null, dataB:null, who:null, tab:'checkin' };
+
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+  function fmtDate(d){
+    const dt = new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'});
+  }
+  function monthLabel(d){
+    const dt = new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('en-US',{month:'short', year:'numeric'});
+  }
+  function emptyPersonData(){ return { products: [], logs: {}, notes: [] }; }
+  function uid(){ return Math.random().toString(36).slice(2,9); }
+
+  async function loadAll(){
+    try{
+      const meta = await window.storage.get('meta', true);
+      state.meta = meta ? JSON.parse(meta.value) : null;
+    }catch(e){ state.meta = null; }
+    if(state.meta){
+      state.dataA = await loadPerson('A');
+      state.dataB = await loadPerson('B');
+    }
+    render();
+  }
+  async function loadPerson(key){
+    try{
+      const r = await window.storage.get('data:'+key, true);
+      return r ? JSON.parse(r.value) : emptyPersonData();
+    }catch(e){ return emptyPersonData(); }
+  }
+  async function savePerson(key){
+    const d = key === 'A' ? state.dataA : state.dataB;
+    try{ await window.storage.set('data:'+key, JSON.stringify(d), true); }
+    catch(e){ console.error('save failed', e); }
+  }
+  async function saveMeta(){
+    try{ await window.storage.set('meta', JSON.stringify(state.meta), true); }
+    catch(e){ console.error('meta save failed', e); }
+  }
+
+  function currentData(){ return state.who === 'A' ? state.dataA : state.dataB; }
+  function otherData(){ return state.who === 'A' ? state.dataB : state.dataA; }
+  function currentKey(){ return state.who; }
+
+  function streakFor(data){
+    let streak = 0;
+    let d = new Date();
+    while(true){
+      const iso = d.toISOString().slice(0,10);
+      const log = data.logs[iso];
+      if(log && (log.am || log.pm)){ streak++; d.setDate(d.getDate()-1); }
+      else break;
+    }
+    return streak;
+  }
+
+  function render(){
+    if(!state.meta){ root.innerHTML = setupView(); attachSetup(); return; }
+    if(!state.who){ root.innerHTML = whoView(); attachWho(); return; }
+    root.innerHTML = appShell();
+    attachShell();
+  }
+
+  function setupView(){
+    return `
+      <div class="sc-body">
+        <div class="setup-card">
+          <div class="eyebrow">Parallel Logs</div>
+          <h2>Two names, two lanes</h2>
+          <p>Set your names once — you'll each pick your own lane every time you open this.</p>
+          <div class="name-inputs">
+            <input id="nameA" placeholder="First name (e.g. Luke)" />
+            <input id="nameB" placeholder="Second name (e.g. your friend)" />
+          </div>
+          <button class="btn" id="setupBtn" style="width:100%">Start tracking</button>
+        </div>
+      </div>`;
+  }
+  function attachSetup(){
+    document.getElementById('setupBtn').onclick = async () => {
+      const a = document.getElementById('nameA').value.trim() || 'Person A';
+      const b = document.getElementById('nameB').value.trim() || 'Person B';
+      state.meta = { nameA:a, nameB:b };
+      state.dataA = emptyPersonData();
+      state.dataB = emptyPersonData();
+      await saveMeta();
+      await savePerson('A');
+      await savePerson('B');
+      render();
+    };
+  }
+
+  function whoView(){
+    return `
+      <div class="sc-body">
+        <div class="setup-card">
+          <div class="eyebrow">Who's logging in?</div>
+          <h2>Pick your lane</h2>
+          <div class="who-picker" style="margin-top:16px">
+            <div class="who-pill" id="pickA">${state.meta.nameA}</div>
+            <div class="who-pill" id="pickB">${state.meta.nameB}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+  function attachWho(){
+    document.getElementById('pickA').onclick = () => { state.who='A'; render(); };
+    document.getElementById('pickB').onclick = () => { state.who='B'; render(); };
+  }
+
+  function appShell(){
+    const myName = state.who==='A' ? state.meta.nameA : state.meta.nameB;
+    const otherName = state.who==='A' ? state.meta.nameB : state.meta.nameA;
+    return `
+      <div class="sc-header">
+        <div class="eyebrow">Skincare Ledger</div>
+        <h1>Hi, ${myName}</h1>
+        <div class="sc-sub">Tracking alongside ${otherName} · <span id="switchWho" style="text-decoration:underline; cursor:pointer">switch</span></div>
+      </div>
+      <div class="sc-tabs">
+        <button class="sc-tab ${state.tab==='checkin'?'active':''}" data-tab="checkin">Today</button>
+        <button class="sc-tab ${state.tab==='shelf'?'active':''}" data-tab="shelf">My Shelf</button>
+        <button class="sc-tab ${state.tab==='compare'?'active':''}" data-tab="compare">Both Lanes</button>
+        <button class="sc-tab ${state.tab==='recap'?'active':''}" data-tab="recap">Recap</button>
+      </div>
+      <div class="sc-body" id="tabBody"></div>
+    `;
+  }
+
+  function attachShell(){
+    document.getElementById('switchWho').onclick = () => { state.who=null; render(); };
+    document.querySelectorAll('.sc-tab').forEach(t => {
+      t.onclick = () => { state.tab = t.dataset.tab; render(); };
+    });
+    const body = document.getElementById('tabBody');
+    if(state.tab==='checkin') renderCheckin(body);
+    else if(state.tab==='shelf') renderShelf(body);
+    else if(state.tab==='compare') renderCompare(body);
+    else renderRecap(body);
+  }
+
+  // ---- Today / check-in ----
+  function renderCheckin(body){
+    const data = currentData();
+    const iso = todayISO();
+    const log = data.logs[iso] || { am:false, pm:false, mood:null, note:'' };
+    const streak = streakFor(data);
+    body.innerHTML = `
+      <div class="checkin-card">
+        <div class="date-lbl eyebrow">${fmtDate(iso)}</div>
+        <div class="checkin-row">
+          <div class="toggle ${log.am?'on':''}" id="toggleAM">☀️ AM done</div>
+          <div class="toggle ${log.pm?'on':''}" id="togglePM">🌙 PM done</div>
+        </div>
+        <div class="eyebrow" style="margin-top:6px">How'd skin feel today?</div>
+        <div class="mood-row">
+          ${MOODS.map(m => `<div class="mood-btn ${log.mood===m?'on':''}" data-mood="${m}">${m}</div>`).join('')}
+        </div>
+        <input id="noteInput" placeholder="Quick note (optional) — e.g. tiny purging on chin" value="${log.note||''}" />
+        <button class="btn" id="saveCheckin" style="margin-top:10px; width:100%">Save today</button>
+        ${streak>0 ? `<div class="streak-badge">🔥 ${streak} day streak</div>` : ''}
+      </div>
+      <div class="section-title">Note to ${state.who==='A'?state.meta.nameB:state.meta.nameA}</div>
+      <div class="checkin-card">
+        <div class="note-thread">
+          ${data.notes.length ? data.notes.slice(-6).map(n=>`<div class="note-item"><span class="who">${n.who}</span>${n.text}</div>`).join('') : '<div class="empty">No notes yet — leave one below.</div>'}
+        </div>
+        <div class="compose">
+          <input id="noteCompose" placeholder="Say something to your lane partner…" />
+          <button class="btn small" id="sendNote">Send</button>
+        </div>
+      </div>
+    `;
+    let tempLog = {...log};
+    document.getElementById('toggleAM').onclick = (e) => { tempLog.am = !tempLog.am; e.target.classList.toggle('on'); };
+    document.getElementById('togglePM').onclick = (e) => { tempLog.pm = !tempLog.pm; e.target.classList.toggle('on'); };
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.onclick = () => {
+        tempLog.mood = tempLog.mood === btn.dataset.mood ? null : btn.dataset.mood;
+        document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));
+        if(tempLog.mood) btn.classList.add('on');
+      };
+    });
+    document.getElementById('saveCheckin').onclick = async () => {
+      tempLog.note = document.getElementById('noteInput').value;
+      data.logs[iso] = tempLog;
+      await savePerson(state.who);
+      render();
+    };
+    document.getElementById('sendNote').onclick = async () => {
+      const val = document.getElementById('noteCompose').value.trim();
+      if(!val) return;
+      const myName = state.who==='A'?state.meta.nameA:state.meta.nameB;
+      data.notes.push({ who: myName, text: val, date: iso });
+      await savePerson(state.who);
+      render();
+    };
+  }
+
+  // ---- My Shelf (products) ----
+  function renderShelf(body){
+    const data = currentData();
+    body.innerHTML = `
+      <div class="section-title">Add a product</div>
+      <div class="checkin-card">
+        <div class="add-form">
+          <input id="pName" placeholder="Product name — e.g. The Ordinary Retinol" />
+          <div class="form-row">
+            <select id="pCat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select>
+            <input id="pSize" placeholder="Size (optional, e.g. 30ml)" />
+          </div>
+          <div class="form-row">
+            <div>
+              <div class="eyebrow" style="margin-bottom:4px">Started</div>
+              <input type="date" id="pStart" value="${todayISO()}" />
+            </div>
+          </div>
+          <button class="btn" id="addProduct">Add to shelf</button>
+        </div>
+      </div>
+      <div class="section-title">Currently using</div>
+      <div id="activeList"></div>
+      <div class="section-title">Finished / archived</div>
+      <div id="finishedList"></div>
+    `;
+    document.getElementById('addProduct').onclick = async () => {
+      const name = document.getElementById('pName').value.trim();
+      if(!name) return;
+      data.products.push({
+        id: uid(), name, category: document.getElementById('pCat').value,
+        size: document.getElementById('pSize').value.trim(),
+        started: document.getElementById('pStart').value || todayISO(),
+        finished: null, verdict: null
+      });
+      await savePerson(state.who);
+      render();
+    };
+    const active = data.products.filter(p=>!p.finished);
+    const finished = data.products.filter(p=>p.finished);
+    document.getElementById('activeList').innerHTML = active.length ? active.map(productCard).join('') : '<div class="empty">Nothing on the shelf yet.</div>';
+    document.getElementById('finishedList').innerHTML = finished.length ? finished.map(productCard).join('') : '<div class="empty">Nothing finished yet — give it time.</div>';
+    document.querySelectorAll('[data-finish]').forEach(btn => {
+      btn.onclick = async () => {
+        const p = data.products.find(x=>x.id===btn.dataset.finish);
+        p.finished = todayISO();
+        await savePerson(state.who);
+        render();
+      };
+    });
+    document.querySelectorAll('[data-verdict]').forEach(chip => {
+      chip.onclick = async () => {
+        const [pid, v] = chip.dataset.verdict.split('||');
+        const p = data.products.find(x=>x.id===pid);
+        p.verdict = p.verdict === v ? null : v;
+        await savePerson(state.who);
+        render();
+      };
+    });
+  }
+  function productCard(p){
+    const dur = p.finished ? Math.round((new Date(p.finished)-new Date(p.started))/86400000) : Math.round((new Date()-new Date(p.started))/86400000);
+    return `
+      <div class="product-card">
+        <span class="status-tag ${p.finished?'status-finished':'status-active'}">${p.finished?'Finished':'Active'}</span>
+        <div class="name">${p.name}</div>
+        <div class="meta">${p.category}${p.size?' · '+p.size:''} · started ${fmtDate(p.started)}${p.finished?' · finished '+fmtDate(p.finished):''} · day ${dur}</div>
+        <div class="verdict-row">
+          ${VERDICTS.map(v=>`<div class="verdict-chip ${p.verdict===v?'on':''}" data-verdict="${p.id}||${v}">${v}</div>`).join('')}
+        </div>
+        ${!p.finished ? `<button class="btn ghost small" style="margin-top:10px" data-finish="${p.id}">Mark bottle finished</button>` : ''}
+      </div>`;
+  }
+
+  // ---- Compare / both lanes ----
+  function renderCompare(body){
+    const a = state.dataA, b = state.dataB;
+    const entries = [];
+    a.products.forEach(p => entries.push({ who:'a', label:state.meta.nameA, date:p.started, txt:`Started ${p.name}` }));
+    a.products.filter(p=>p.finished).forEach(p => entries.push({ who:'a', label:state.meta.nameA, date:p.finished, txt:`Finished ${p.name}${p.verdict?' — '+p.verdict:''}` }));
+    b.products.forEach(p => entries.push({ who:'b', label:state.meta.nameB, date:p.started, txt:`Started ${p.name}` }));
+    b.products.filter(p=>p.finished).forEach(p => entries.push({ who:'b', label:state.meta.nameB, date:p.finished, txt:`Finished ${p.name}${p.verdict?' — '+p.verdict:''}` }));
+    entries.sort((x,y)=> new Date(y.date)-new Date(x.date));
+    body.innerHTML = `
+      <div class="section-title">Streaks</div>
+      <div class="checkin-row" style="margin-bottom:6px">
+        <div class="checkin-card" style="flex:1"><div class="eyebrow">${state.meta.nameA}</div><div style="font-size:22px; margin-top:4px">🔥 ${streakFor(a)}</div></div>
+        <div class="checkin-card" style="flex:1"><div class="eyebrow">${state.meta.nameB}</div><div style="font-size:22px; margin-top:4px">🔥 ${streakFor(b)}</div></div>
+      </div>
+      <div class="section-title">Shared timeline</div>
+      <div class="lane-track">
+        ${entries.length ? entries.map(e=>`
+          <div class="lane-entry ${e.who}">
+            <div class="who">${e.label} · ${fmtDate(e.date)}</div>
+            <div class="txt">${e.txt}</div>
+          </div>`).join('') : '<div class="empty">Add products on each Shelf to see them line up here.</div>'}
+      </div>
+    `;
+  }
+
+  // ---- Recap ----
+  function renderRecap(body){
+    const a = state.dataA, b = state.dataB;
+    const now = new Date();
+    const isoMonth = now.toISOString().slice(0,7);
+    function monthStats(data){
+      const days = Object.keys(data.logs).filter(d=>d.startsWith(isoMonth));
+      const done = days.filter(d=>data.logs[d].am || data.logs[d].pm).length;
+      const moods = days.map(d=>data.logs[d].mood).filter(Boolean);
+      const glowing = moods.filter(m=>m==='🌟').length;
+      return { logged: done, totalDays: days.length, glowing };
+    }
+    const sa = monthStats(a), sb = monthStats(b);
+    body.innerHTML = `
+      <div class="recap-card">
+        <div class="eyebrow">${monthLabel(todayISO())} Recap</div>
+        <h3>${state.meta.nameA} vs ${state.meta.nameB}</h3>
+        <div class="recap-stat"><span>Days logged</span><span>${sa.logged} vs ${sb.logged}</span></div>
+        <div class="recap-stat"><span>Current streak</span><span>${streakFor(a)} vs ${streakFor(b)}</span></div>
+        <div class="recap-stat"><span>"Glowing" days 🌟</span><span>${sa.glowing} vs ${sb.glowing}</span></div>
+        <div class="recap-stat"><span>Products on shelf</span><span>${a.products.length} vs ${b.products.length}</span></div>
+      </div>
+      <div class="section-title">All finished products, ranked by verdict</div>
+      ${renderRankedFinished(a, b)}
+    `;
+  }
+  function renderRankedFinished(a,b){
+    const all = [
+      ...a.products.filter(p=>p.finished).map(p=>({...p, who:state.meta.nameA})),
+      ...b.products.filter(p=>p.finished).map(p=>({...p, who:state.meta.nameB})),
+    ];
+    if(!all.length) return '<div class="empty">Finish a bottle to start building your hall of fame.</div>';
+    const order = { 'Glow':0, 'Still deciding':1, 'Meh':2, 'Breakout':3 };
+    all.sort((x,y)=> (order[x.verdict]??4) - (order[y.verdict]??4));
+    return all.map(p=>`
+      <div class="product-card">
+        <span class="status-tag status-finished">${p.verdict||'No verdict'}</span>
+        <div class="name">${p.name}</div>
+        <div class="meta">${p.who} · ${fmtDate(p.started)} → ${fmtDate(p.finished)}</div>
+      </div>`).join('');
+  }
+
+  loadAll();
+})();
+</script>
+
+</body>
+</html>
